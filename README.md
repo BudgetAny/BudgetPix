@@ -103,3 +103,5 @@ This implementation builds on [JiT](https://github.com/LTH14/JiT), [pixel MeanFl
 [MiniT2I](https://github.com/Hope7Happiness/minit2i-torch) and [PixelDiT](https://github.com/NVlabs/PixelDiT), whose released
 models are its backbones. The entropy-based layout follows [APT](https://github.com/rccchoudhury/apt), and FID and IS are
 computed with the [LTH14 fork of torch-fidelity](https://github.com/LTH14/torch-fidelity).
+
+We acknowledge the compute support of the Health Care Engineering Systems Center within the Coordinated Science Lab at UIUC.
