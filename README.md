@@ -14,6 +14,8 @@
 
 -----
 
+**In addition to BudgetPix, we now release its family, [BudgetAny](https://budgetany.github.io/), extended to [Budget3D](https://budgetany.github.io/budget3d/)** ([code](https://github.com/BudgetAny/Budget3D), [models](https://huggingface.co/BudgetAny)).
+
 **BudgetPix** makes pixel-space diffusion transformers compute-adaptive: one checkpoint runs at any token budget. An
 entropy-guided quadtree merges flat regions into coarser tokens, the backbone runs on the shorter sequence, and a small
 token-local refiner restores the detail inside every merged token. The budget is a number you pass at inference.
