@@ -9,7 +9,7 @@
   🌐 <a href="https://budgetany.github.io/budgetpix/"><b>Project page</b></a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.12307">Paper</a> &nbsp;|&nbsp;
   🤗 <a href="https://huggingface.co/BudgetAny">Models</a> &nbsp;|&nbsp;
-  🧩 <a href="https://budgetany.github.io/">BudgetAny</a>: BudgetPix · <a href="https://github.com/BudgetAny/Budget3D">Budget3D</a> · <a href="https://github.com/BudgetAny/BudgetLatent">BudgetLatent</a>
+  🧩 <a href="https://budgetany.github.io/">BudgetAny</a>: BudgetPix · <a href="https://github.com/BudgetAny/Budget3D">Budget3D</a> · <a href="https://budgetany.github.io/budgetlatent/">BudgetLatent</a>
 </p>
 
 -----
@@ -30,7 +30,7 @@ token-local refiner restores the detail inside every merged token. The budget is
 
 ## 🔥 News
 
-- **Nov 2026:** BudgetPix joins [BudgetAny](https://budgetany.github.io/), next to [Budget3D](https://github.com/BudgetAny/Budget3D) and [BudgetLatent](https://github.com/BudgetAny/BudgetLatent).
+- **Nov 2026:** BudgetPix joins [BudgetAny](https://budgetany.github.io/), next to [Budget3D](https://github.com/BudgetAny/Budget3D) and [BudgetLatent](https://budgetany.github.io/budgetlatent/) (coming soon).
 - **Oct 2026:** Code and checkpoints for JiT, pixel MeanFlow, MiniT2I and PixelDiT.
 
 ## 📦 Models
