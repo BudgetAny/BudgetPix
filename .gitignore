@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pt
+*.pth
+*.tmp
+runs/
+evals/
+samples*.png
+*_layout.png
+checkpoints/*
+!checkpoints/SHA256SUMS
+upstream/
+logs/
+*.out
