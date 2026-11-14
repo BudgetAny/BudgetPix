@@ -93,12 +93,17 @@ def main():
                 h, n = line.split()
                 sums[n.lstrip("*")] = h
     os.makedirs(a.out, exist_ok=True)
+    described = set()
     for name in names:
         fname = MODELS[name]
         dst = os.path.join(a.out, fname)
         if os.path.exists(dst) and sha256(dst) == sums.get(fname):
             print(f"[ok] {fname} already present and verified"); continue
-        fetch(f"{a.base_url}/{REPO[name.split('_')[0]]}/resolve/main/{fname}", dst)
+        repo = REPO[name.split('_')[0]]
+        if repo not in described:       # each repo's config.json (its checkpoints, the code), next to the weights
+            fetch(f"{a.base_url}/{repo}/resolve/main/config.json", os.path.join(a.out, f"{repo}.config.json"))
+            described.add(repo)
+        fetch(f"{a.base_url}/{repo}/resolve/main/{fname}", dst)
         got = sha256(dst)
         if sums.get(fname) and got != sums[fname]:
             raise SystemExit(f"{fname}: sha256 mismatch ({got} != {sums[fname]}); delete it and retry")
