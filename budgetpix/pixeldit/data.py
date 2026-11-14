@@ -3,7 +3,7 @@
 Three input forms, all yielding images in [-1,1] (B,3,1024,1024), Gemma embeddings (B,300,2304)
 and mask (B,300):
 
-  1. `chunks`   folders of `chunk_*.pt` written by `scripts/precompute_data.py` (uint8 pixels and encoded
+  1. `chunks`   folders of `chunk_*.pt` written by `tools/precompute_data.py` (uint8 pixels and encoded
                 captions). Recommended.
   2. `tars`     webdataset shards (`*.tar` holding an image and a `.json` per key). Captions come from
                 the external caption jsons beside a shard (see CAPTION_SUFFIXES), else from the
@@ -89,7 +89,7 @@ class ChunkStream(IterableDataset):
         self.rank, self.world = _rank(), _world()
         self.files = sorted(f for r in self.roots for f in r.glob("chunk_*.pt"))
         if not self.files:
-            raise RuntimeError(f"no chunk_*.pt under {[str(r) for r in self.roots]} — run scripts/precompute_data.py")
+            raise RuntimeError(f"no chunk_*.pt under {[str(r) for r in self.roots]} — run budgetpix.pixeldit.tools.precompute_data")
 
     def __iter__(self):
         files = _shard(self.files, "chunks", self.rank, self.world)

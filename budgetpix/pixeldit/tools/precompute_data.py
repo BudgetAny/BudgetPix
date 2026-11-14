@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 """Turn a captioned image set into training chunks: uint8 pixels + encoded Gemma embeddings.
 
-    python scripts/precompute_data.py --tars /path/to/shards --out /path/to/chunks_1024 --size 1024 --per_chunk 64
-    python scripts/precompute_data.py --images /path/to/imgs --out /path/to/chunks_1024 --size 1024
+    python -m budgetpix.pixeldit.tools.precompute_data --tars /path/to/shards --out /path/to/chunks_1024 --size 1024 --per_chunk 64
+    python -m budgetpix.pixeldit.tools.precompute_data --images /path/to/imgs --out /path/to/chunks_1024 --size 1024
 
 Hold out the last shards for evaluation and never point `data.chunks` at them.
 """
 from __future__ import annotations
 
-import argparse, os, sys
+import argparse, os
 
 import torch
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))    # pixeldit/
 
 
 def main():
@@ -31,8 +29,8 @@ def main():
     a = ap.parse_args()
     if not (a.tars or a.images):
         raise SystemExit("--tars or --images")
-    from data import ImageFolderStream, TarStream
-    from text import GemmaEncoder
+    from ..data import ImageFolderStream, TarStream
+    from ..text import GemmaEncoder
     device = "cuda" if torch.cuda.is_available() else "cpu"
     enc = GemmaEncoder(repo=a.llm, device=device)
     # once=True: visit the source exactly once and stop
@@ -59,7 +57,7 @@ def main():
     if pix:
         chunk_i = _flush(pix, caps, enc, a, chunk_i)
     print(f"wrote {chunk_i - a.start_index} chunks ({total} samples) to {a.out}")
-    print("also write the null embedding once:  python scripts/encode_prompts.py --null_only --out eval/null_emb.pt")
+    print("also write the null embedding once:  python -m budgetpix.pixeldit.tools.encode_prompts --null_only --out eval/null_emb.pt")
 
 
 def _flush(pix, caps, enc, a, chunk_i):

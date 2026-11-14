@@ -20,7 +20,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model import BudgetPixPMF, pmf_geometry, dense_L, _rope_complex
+from .model import BudgetPixPMF, pmf_geometry, dense_L, _rope_complex
 
 
 def bipartite_soft_matching(metric, r):

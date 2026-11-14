@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """FID/IS of (adaptive) pMF under N-NFE sampling at a token budget, with a chosen layout source per step.
 
-    torchrun --nproc_per_node=1 eval.py --model released --released pMF-L-16.pt --budget 128 --nfe 1 --first self
-    torchrun ... --model runs/pmf_l16/checkpoint-s64000.pt --budget 128 --nfe 2 --first dense --later xhat
+    torchrun --nproc_per_node=1 -m budgetpix.pmf.eval --model released --released pMF-L-16.pt --budget 128 --nfe 1 --first self
+    torchrun ... -m budgetpix.pmf.eval --model runs/pmf_l16/checkpoint-s64000.pt --budget 128 --nfe 2 --first dense --later xhat
 
 Sampling: z_1 = noise * noise_scale (per-image noise seeded by the image index), t on linspace(1, 0, nfe+1),
 z <- z - (t - r) u(z, t, h = t - r, omega, t_min, t_max, y), with the layout L of each step from:
@@ -14,21 +14,20 @@ z <- z - (t - r) u(z, t, h = t - r, omega, t_min, t_max, y), with the layout L o
 Budget >= the dense token count -> the dense grid. FID/IS vs jit_in256_stats.npz. --num 10000 = 10 per class.
 Rows -> evals/eval.tsv
 
-    PMF_ROOT=/path/to/pMF torchrun --nproc_per_node=4 eval.py --arch L16 --model ../checkpoints/budgetpix_pmf_l16_256.pt \
+    PMF_ROOT=/path/to/pMF torchrun --nproc_per_node=4 -m budgetpix.pmf.eval --arch L16 --model checkpoints/budgetpix_pmf_l16_256.pt \
         --budget 128 --nfe 1 --first self --num 50000
-    PMF_ROOT=/path/to/pMF PMF_WEIGHTS=/path/to/pMF-L-16.pt torchrun ... eval.py --arch L16 --model released --budget 128   # no-training control"""
-import argparse, os, sys, shutil, time
+    PMF_ROOT=/path/to/pMF PMF_WEIGHTS=/path/to/pMF-L-16.pt torchrun ... -m budgetpix.pmf.eval --arch L16 --model released --budget 128   # no-training control"""
+import argparse, os, shutil, time
 import numpy as np, torch, torch.distributed as dist
 from PIL import Image
-HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, HERE)
-from upstream import add_pmf_root                                   # noqa: E402
+from .upstream import add_pmf_root
 add_pmf_root()
 from models.pmfDiT import pmfDiT_B_16, pmfDiT_L_16, pmfDiT_H_16              # noqa: E402
 from utils.torch_util import BatchGenerator                                    # noqa: E402
-from model import BudgetPixPMF, pmf_geometry, dense_L                   # noqa: E402
-from layout import pack, detail_pyramid, _pyr_np, calibrate_offsets_batched, _leaf_masks_np, tokens_from_masks  # noqa: E402
+from .model import BudgetPixPMF, pmf_geometry, dense_L                   # noqa: E402
+from ..common.layout import pack, detail_pyramid, _pyr_np, calibrate_offsets_batched, _leaf_masks_np, tokens_from_masks  # noqa: E402
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 ARCH = {"B16": pmfDiT_B_16, "L16": pmfDiT_L_16, "H16": pmfDiT_H_16}
 NOISE_SCALE = {"B16": 1.0, "L16": 1.0, "H16": 2.0}
 WEIGHTS = os.environ.get("PMF_WEIGHTS", "")      # the released pMF weights (u-path .pt from the Hub, or the full u+v file)
@@ -55,7 +54,7 @@ def build(arch, model_arg, use_ema=True, policy="adaptive", reduce_budget=None, 
             raise SystemExit("the released model needs its weights: pass --released <pMF-L-16.pt> or set PMF_WEIGHTS")
         load_released(net, released)
     if policy in ("tome", "featsim"):
-        from reduced_pmf import ReducedPMF
+        from .reduced_pmf import ReducedPMF
         assert model_arg == "released", "ToMe / FeatSim run on the released model"
         return ReducedPMF(net, policy=policy, budget=reduce_budget)
     ck = None

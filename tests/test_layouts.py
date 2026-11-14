@@ -6,7 +6,7 @@ For each family and geometry: the dense layout and every budget layout tile the 
 of the allowed sizes; a budget is never exceeded, the dense budget gives the dense grid, smaller budgets never give
 more tokens, a flat image merges completely; pack() keeps every token.
 """
-import importlib.util
+import importlib
 import os
 import sys
 
@@ -14,14 +14,14 @@ import numpy as np
 import torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)                  # the repository root, which holds the budgetpix package
+# PixelDiT and pMF share one layout module
+MODULE = {"jit": "budgetpix.jit.layout", "minit2i": "budgetpix.minit2i.layout",
+          "pixeldit": "budgetpix.common.layout", "pmf": "budgetpix.common.layout"}
 
 
 def load(family):
-    spec = importlib.util.spec_from_file_location(f"{family}_layout", os.path.join(ROOT, family, "layout.py"))
-    m = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = m            # dataclasses look their module up
-    spec.loader.exec_module(m)
-    return m
+    return importlib.import_module(MODULE[family])
 
 
 def images(geo, n=3, seed=0):

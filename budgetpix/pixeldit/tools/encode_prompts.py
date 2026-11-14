@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 """Build the fixed evaluation prompt set: Gemma embeddings + masks + the null embedding.
 
-    python scripts/encode_prompts.py --captions eval/captions.txt --n 2000 --out eval/prompts_2k.pt
-    python scripts/encode_prompts.py --chunks /path/to/chunks_heldout --n 2000 --out eval/prompts_2k.pt
-    python scripts/encode_prompts.py --null_only --out eval/null_emb.pt
+    python -m budgetpix.pixeldit.tools.encode_prompts --captions eval/captions.txt --n 2000 --out eval/prompts_2k.pt
+    python -m budgetpix.pixeldit.tools.encode_prompts --chunks /path/to/chunks_heldout --n 2000 --out eval/prompts_2k.pt
+    python -m budgetpix.pixeldit.tools.encode_prompts --null_only --out eval/null_emb.pt
 """
 from __future__ import annotations
 
-import argparse, glob, os, sys
+import argparse, glob, os
 
 import torch
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))    # pixeldit/
 
 
 def main():
@@ -25,7 +23,7 @@ def main():
     ap.add_argument("--bs", type=int, default=8)
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    from text import NEGATIVE_PROMPT, GemmaEncoder
+    from ..text import NEGATIVE_PROMPT, GemmaEncoder
     device = "cuda" if torch.cuda.is_available() else "cpu"
     enc = GemmaEncoder(repo=a.llm, device=device)
     # the training null (caption dropout) is the empty string; the eval null (CFG) is the negative prompt

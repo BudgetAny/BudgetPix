@@ -56,9 +56,9 @@ def load_adaptive_checkpoint(path, device="cpu", use_ema=True, verbose=True):
     """
     ck = _load_cpu(path)
     cfg = ck["cfg"]
-    from layout import Geometry
-    from model import BudgetPixPixelDiT
-    from upstream import build_released
+    from ..common.layout import Geometry
+    from .model import BudgetPixPixelDiT
+    from .upstream import build_released
     arch = dict(cfg["net_cfg"])
     arch.update(image_size=int(cfg["image_size"]), patch_size=int(cfg["patch_size"]))
     net = build_released(arch)

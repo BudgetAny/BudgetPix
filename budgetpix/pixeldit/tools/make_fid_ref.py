@@ -3,9 +3,9 @@
 
 Use held-out data and the same N as the eval.
 
-    python scripts/make_fid_ref.py --tars /path/to/shards_heldout --n 2000 --out eval/real_2k --size 1024
-    python scripts/make_fid_ref.py --images /path/to/val --n 2000 --out eval/real_2k --size 1024
-    python scripts/make_fid_ref.py --chunks /path/to/chunks_heldout --n 2000 --out eval/real_2k
+    python -m budgetpix.pixeldit.tools.make_fid_ref --tars /path/to/shards_heldout --n 2000 --out eval/real_2k --size 1024
+    python -m budgetpix.pixeldit.tools.make_fid_ref --images /path/to/val --n 2000 --out eval/real_2k --size 1024
+    python -m budgetpix.pixeldit.tools.make_fid_ref --chunks /path/to/chunks_heldout --n 2000 --out eval/real_2k
 """
 from __future__ import annotations
 

@@ -2,8 +2,8 @@
 # BudgetPix on PixelDiT-T2I 1024 px
 # ============================================================================================
 #
-#   PIXELDIT_ROOT=/path/to/PixelDiT torchrun --nproc_per_node=4 train.py \
-#       --config configs/pixeldit_1024.yml --resume
+#   PIXELDIT_ROOT=/path/to/PixelDiT torchrun --nproc_per_node=4 -m budgetpix.pixeldit.train \
+#       --config configs/pixeldit/pixeldit_1024.yml --resume
 
 # ---- geometry -------------------------------------------------------------------------------
 image_size: 1024
@@ -13,13 +13,13 @@ thresholds: [6.0, 4.0]         # bits of entropy to merge 16->32 and 32->64
 
 # ---- the released model ---------------------------------------------------------------------
 checkpoint: /path/to/pixeldit_t2i_v1.pth       # released weights: HF nvidia/PixelDiT-1300M-1024px
-config_json: config.json                       # ships in this folder (configs/); architecture only
+config_json: config.json                       # ships in this folder (configs/pixeldit/); architecture only
 
 # ---- released law ---------------------------------------------------------------------------
 flow_shift: 4.0                # linear_flow sigmas, shifted
 diffusion_steps: 1000
 caption_drop: 0.1              # dropout onto the null embedding
-null_emb: eval/null_emb.pt     # the training null = empty string (scripts/encode_prompts.py --null_only)
+null_emb: eval/null_emb.pt     # the training null = empty string (budgetpix.pixeldit.tools.encode_prompts --null_only)
 llm: Efficient-Large-Model/gemma-2-2b-it   # frozen text encoder (HF id or a local snapshot dir)
 lr: 2.0e-5                     # constant
 warmup: 2000
@@ -55,7 +55,7 @@ seed: 0
 output_dir: runs/pixeldit_1024
 
 data:
-  chunks: [/path/to/chunks_1024]     # scripts/precompute_data.py output (uint8 pixels + encoded Gemma captions)
+  chunks: [/path/to/chunks_1024]     # budgetpix.pixeldit.tools.precompute_data output (uint8 pixels + encoded Gemma captions)
   # tars: [/path/to/webdataset]      # or webdataset shards, encoding captions on the fly
   micro_batch_size: 4                # per process
   num_workers: 8

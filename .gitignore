@@ -12,3 +12,6 @@ checkpoints/*
 upstream/
 logs/
 *.out
+build/
+dist/
+*.egg-info/

@@ -12,7 +12,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-from layout import (Geometry, all_base_tokens, detail_pyramid, layouts_batched, pack, pyramid_slice, _leaf_masks_np, _pyr_np,
+from ..common.layout import (Geometry, all_base_tokens, detail_pyramid, layouts_batched, pack, pyramid_slice, _leaf_masks_np, _pyr_np,
                      tokens_from_masks)
 
 DIFFUSION_STEPS = 1000

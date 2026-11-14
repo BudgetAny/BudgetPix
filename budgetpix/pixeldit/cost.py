@@ -9,7 +9,7 @@ from __future__ import annotations
 import contextlib
 import torch
 
-from layout import Geometry, all_base_tokens, pack
+from ..common.layout import Geometry, all_base_tokens, pack
 
 
 class FlopMeter:

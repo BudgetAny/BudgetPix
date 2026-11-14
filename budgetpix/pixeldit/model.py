@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint
 
-from layout import Geometry
+from ..common.layout import Geometry
 
 
 def analytic_freqs_cis_2d(dim, centres, Hs, Ws, theta=10000.0, scale=16.0):

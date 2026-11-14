@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 """Sample from a BudgetPix PixelDiT checkpoint at a chosen token budget.
 
-    PIXELDIT_ROOT=/path/to/PixelDiT python sample.py \
-        --ckpt ../checkpoints/budgetpix_pixeldit_1024.pt --prompts "a photo of a cat" --budget 2048 --cfg 2.75
+    PIXELDIT_ROOT=/path/to/PixelDiT python -m budgetpix.pixeldit.sample \
+        --ckpt checkpoints/budgetpix_pixeldit_1024.pt --prompts "a photo of a cat" --budget 2048 --cfg 2.75
 
 The dense grid at 1024 px is 4096 tokens; --budget 2048 is 50 %, 1024 is 25 %. Omit --budget for the
 dense grid.
 """
 from __future__ import annotations
 
-import argparse, os, sys
+import argparse, os
 
 import torch
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from diffusion import FlowSchedule, sample                                   # noqa: E402
-from text import GemmaEncoder, NEGATIVE_PROMPT                    # noqa: E402
+from .diffusion import FlowSchedule, sample
+from .text import GemmaEncoder, NEGATIVE_PROMPT
 
 
 def main():
@@ -49,7 +48,7 @@ def main():
         torch.cuda.empty_cache()
 
     # 2. the adaptive model (EMA weights) and its geometry
-    from convert import load_adaptive_checkpoint
+    from .convert import load_adaptive_checkpoint
     model, geo, cfg, _ = load_adaptive_checkpoint(a.ckpt, device=device)
     sched = FlowSchedule(int(cfg.get("diffusion_steps", 1000)), float(cfg.get("flow_shift", 4.0)))
 

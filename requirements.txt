@@ -15,7 +15,7 @@ pyarrow
 # pMF fine-tuning only: the perceptual terms of pMF's loss (LPIPS-VGG; ConvNeXt-V2 comes from transformers)
 lpips
 # Evaluation only (FID / IS). The LTH14 fork is required: it accepts fid_statistics_file=..., which
-# jit/eval.py relies on; plain PyPI torch-fidelity does not.
+# budgetpix/jit/eval.py relies on; plain PyPI torch-fidelity does not.
 torch-fidelity @ git+https://github.com/LTH14/torch-fidelity.git@bfe72b9
 # Optional, CUDA only: flash-attn (varlen kernels). Without it an exact SDPA fallback runs, slower.
 #   pip install flash-attn --no-build-isolation

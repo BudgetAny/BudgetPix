@@ -1,7 +1,7 @@
 """FID / IS of a BudgetPix MiniT2I checkpoint at a token budget, on held-out captions.
 
-    MINIT2I_ROOT=/path/to/minit2i-torch torchrun --nproc_per_node=4 eval.py \
-        --ckpt ../checkpoints/budgetpix_minit2i_l_512.pt --data /path/to/mix120k/chunks_heldout --budget 512 --cfg 5.0
+    MINIT2I_ROOT=/path/to/minit2i-torch torchrun --nproc_per_node=4 -m budgetpix.minit2i.eval \
+        --ckpt checkpoints/budgetpix_minit2i_l_512.pt --data /path/to/mix120k/chunks_heldout --budget 512 --cfg 5.0
 
 The held-out chunks (data.py format) give the captions and reference images (all by default, or the first --n).
 """
@@ -16,11 +16,11 @@ import torch
 import torch.distributed as dist
 from PIL import Image
 
-from data import TextEncoder
-from diffusion import sample
-from model import load_model
+from .data import TextEncoder
+from .diffusion import sample
+from .model import load_model
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))      # the repository root
 
 
 def prepare(data, n, work, tag):
@@ -61,7 +61,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ckpt", help="BudgetPix checkpoint (release file or train.py checkpoint)")
     ap.add_argument("--released", help="released MiniT2I weights instead of --ckpt (the untrained control)")
-    ap.add_argument("--config", default=os.path.join(HERE, "configs", "minit2i_l_512.yml"), help="geometry for --released")
+    ap.add_argument("--config", default=os.path.join(ROOT, "configs", "minit2i", "minit2i_l_512.yml"), help="geometry for --released")
     ap.add_argument("--data", required=True, help="held-out chunk_*.pt folder (captions and reference images)")
     ap.add_argument("--n", type=int, default=0, help="number of held-out captions / images (0 = all)")
     ap.add_argument("--budget", type=int, default=None, help="tokens per image; default: the dense grid")

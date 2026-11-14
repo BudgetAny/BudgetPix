@@ -70,14 +70,14 @@ python scripts/download_checkpoints.py --all                        # or all of 
 `--budget` is the number of tokens per image (here half of the full grid); without it, the model runs on the full grid.
 
 ```bash
-cd jit           # JiT: class-conditional ImageNet, with the token layout
-python sample.py --ckpt ../checkpoints/budgetpix_jit_l32_512.pth --classes 207,88,417,933 --budget 128 --overlay
-cd ../pmf        # pixel MeanFlow: one-step ImageNet
-python sample.py --ckpt ../checkpoints/budgetpix_pmf_l16_256.pt --classes 207,88,417,933 --budget 128 --overlay
-cd ../minit2i    # MiniT2I: text-to-image
-python sample.py --ckpt ../checkpoints/budgetpix_minit2i_l_512.pt --prompts "a corgi in a spacesuit" --budget 512 --cfg 6.0
-cd ../pixeldit   # PixelDiT: text-to-image
-python sample.py --ckpt ../checkpoints/budgetpix_pixeldit_1024.pt --prompts "a red fox in a snowy forest" --budget 2048
+# JiT: class-conditional ImageNet, with the token layout
+python -m budgetpix.jit.sample --ckpt checkpoints/budgetpix_jit_l32_512.pth --classes 207,88,417,933 --budget 128 --overlay --out samples_jit.png
+# pixel MeanFlow: one-step ImageNet
+python -m budgetpix.pmf.sample --ckpt checkpoints/budgetpix_pmf_l16_256.pt --classes 207,88,417,933 --budget 128 --overlay --out samples_pmf.png
+# MiniT2I: text-to-image
+python -m budgetpix.minit2i.sample --ckpt checkpoints/budgetpix_minit2i_l_512.pt --prompts "a corgi in a spacesuit" --budget 512 --cfg 6.0 --out samples_minit2i.png
+# PixelDiT: text-to-image
+python -m budgetpix.pixeldit.sample --ckpt checkpoints/budgetpix_pixeldit_1024.pt --prompts "a red fox in a snowy forest" --budget 2048 --out samples_pixeldit.png
 ```
 
 ## 📚 Citation

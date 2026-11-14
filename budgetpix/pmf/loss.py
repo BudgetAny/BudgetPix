@@ -5,7 +5,7 @@ Conventions: z_t = (1 - t) x + t e, t = 1 is noise; u, v are velocities; x_hat =
 import math
 import torch
 import torch.nn.functional as F
-from model import cat_L
+from .model import cat_L
 
 
 class PerceptualAux:

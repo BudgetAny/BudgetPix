@@ -1,6 +1,6 @@
 # BudgetPix on MiniT2I-B/16 at 512x512.
-#   MINIT2I_ROOT=/path/to/minit2i-torch torchrun --nproc_per_node=4 train.py --config configs/minit2i_b_512.yml --resume
-# Data: CC12M with LLaVA recaptions (scripts/cc12m_build.py), 100k steps.
+#   MINIT2I_ROOT=/path/to/minit2i-torch torchrun --nproc_per_node=4 -m budgetpix.minit2i.train --config configs/minit2i/minit2i_b_512.yml --resume
+# Data: CC12M with LLaVA recaptions (budgetpix/minit2i/tools/cc12m_build.py), 100k steps.
 image_size: 512
 patch_size: 16                       # finest token (1024 tokens dense)
 scales: [16, 32, 64]                 # token sizes; flat regions merge into 32- and 64-px tokens
@@ -18,7 +18,7 @@ layout:                              # training layouts
   scramble_p: 0.10                   # share of layouts that ignore the content
 
 data:
-  local_dataset_dir: /path/to/cc12m512/chunks_512         # chunk_*.pt (see data.py)
+  local_dataset_dir: /path/to/cc12m512/chunks_512         # chunk_*.pt (see budgetpix/minit2i/data.py)
   micro_batch_size: 16                 # per GPU
   num_workers: 8
 

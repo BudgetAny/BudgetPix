@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 """Adaptive-token finetuning of the released PixelDiT-T2I 1024 px checkpoint.
 
-    PIXELDIT_ROOT=/path/to/PixelDiT torchrun --nproc_per_node=4 train.py \
-        --config configs/pixeldit_1024.yml
+    PIXELDIT_ROOT=/path/to/PixelDiT torchrun --nproc_per_node=4 -m budgetpix.pixeldit.train \
+        --config configs/pixeldit/pixeldit_1024.yml
 
 Warm-starts from the released weights; every added module is zero-gated, so step 0 is the released model.
 """
 from __future__ import annotations
 
-import argparse, os, sys, time
+import argparse, os, time
 from pathlib import Path
 
 import torch
 import yaml
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from diffusion import FlowSchedule, training_loss
-from layout import Geometry, all_base_tokens, pack
-from model import BudgetPixPixelDiT   # noqa: E402
+from .diffusion import FlowSchedule, training_loss
+from ..common.layout import Geometry, all_base_tokens, pack
+from .model import BudgetPixPixelDiT
 
 NEW_PREFIXES = ("mixers.", "refines.")
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -41,8 +40,8 @@ def geometry_of(cfg):
 
 def build_model(cfg, device, verbose=True):
     """Released PixDiT_T2I (+ weights) wrapped in BudgetPixPixelDiT. Returns (model, net, arch)."""
-    from convert import describe, load_released_weights, read_config
-    from upstream import build_released
+    from .convert import describe, load_released_weights, read_config
+    from .upstream import build_released
     ck = cfg.get("checkpoint", "")
     arch = read_config(resolve(cfg["config_json"], cfg.get("_config_path"))) if cfg.get("config_json") else read_config(ck)
     arch = dict(arch)
@@ -103,16 +102,16 @@ def assert_contract(model, net, cfg, geo, device, rel_tol=1e-3):
 # ------------------------------------------------------------------------------------- data
 def build_loader(cfg, device):
     """Yields (images[-1,1] (B,3,H,W), y (B,300,2304), y_mask (B,300))."""
-    from data import make_loader, prepare_images
+    from .data import make_loader, prepare_images
     d = dict(cfg.get("data", {}) or {})
     d.setdefault("seed", cfg.get("seed", 0))
     loader, precomputed = make_loader(d, int(cfg["image_size"]), int(d.get("micro_batch_size", 2)),
                                       int(d.get("num_workers", 8)), int(d.get("dataloader_prefetch", 2)))
     enc = None
     if not precomputed:
-        from text import GemmaEncoder
+        from .text import GemmaEncoder
         print("[data] captions are being encoded on the fly -- a frozen Gemma (~5 GB) now sits on "
-              "every GPU. scripts/precompute_data.py removes it.")
+              "every GPU. budgetpix.pixeldit.tools.precompute_data removes it.")
         enc = GemmaEncoder(repo=cfg.get("llm", "Efficient-Large-Model/gemma-2-2b-it"), device=device)
     while True:
         for batch in loader:
@@ -126,14 +125,14 @@ def build_loader(cfg, device):
 
 
 def load_null(cfg, device, net):
-    """The caption-dropout embedding, made by `scripts/encode_prompts.py --null_only`."""
+    """The caption-dropout embedding, made by `python -m budgetpix.pixeldit.tools.encode_prompts --null_only`."""
     p = resolve(cfg.get("null_emb", ""), cfg.get("_config_path"))
     if p and os.path.exists(p):
         e = torch.load(p, map_location="cpu", weights_only=False)
         e = e["emb"] if isinstance(e, dict) else e
         return e[:1].to(device).float()
     if cfg.get("caption_drop", 0.1) > 0:
-        raise SystemExit(f"null_emb '{p}' not found; make it with scripts/encode_prompts.py --null_only, or set "
+        raise SystemExit(f"null_emb '{p}' not found; make it with budgetpix.pixeldit.tools.encode_prompts --null_only, or set "
                          f"caption_drop: 0 (which changes the recipe -- upstream drops 10%)")
     return None
 

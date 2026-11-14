@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 
-from layout import Geometry, IN_CONTEXT_LEN
+from .layout import Geometry, IN_CONTEXT_LEN
 
 try:
     from flash_attn import flash_attn_varlen_func

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fine-tune one JiT line (global batch 896 on 4 GPUs).
-#   LINE=jit_b16_256 RELEASED=/path/to/jit-b-16/checkpoint-last.pth DATA=/path/to/imagenet-1k bash scripts/train.sh
+#   LINE=jit_b16_256 RELEASED=/path/to/jit-b-16/checkpoint-last.pth DATA=/path/to/imagenet-1k bash scripts/jit/train.sh
 set -eo pipefail
 LINE=${LINE:?jit_b16_256 | jit_b32_512 | jit_l16_256 | jit_l32_512}
 case "$LINE" in
@@ -9,7 +9,8 @@ case "$LINE" in
   jit_l32_512)             EPOCHS=50;  BS=56;  ACCUM=4 ;;
   *) echo "unknown LINE=$LINE" >&2; exit 1 ;;
 esac
-HERE=$(cd "$(dirname "$0")/.." && pwd)                 # jit/
-torchrun --nproc_per_node=${NGPU:-4} "$HERE/train.py" --released "${RELEASED:?released JiT checkpoint of this line}" \
+ROOT=$(cd "$(dirname "$0")/../.." && pwd)              # the repository root
+export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
+torchrun --nproc_per_node=${NGPU:-4} -m budgetpix.jit.train --released "${RELEASED:?released JiT checkpoint of this line}" \
   --data "${DATA:?ImageNet-1k parquet directory}" --epochs $EPOCHS --batch_size $BS --grad_accum $ACCUM \
-  --out "${OUT:-$HERE/runs/$LINE}" --resume
+  --out "${OUT:-$ROOT/runs/$LINE}" --resume

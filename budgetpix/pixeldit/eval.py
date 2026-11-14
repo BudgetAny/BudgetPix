@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """The FID-vs-budget ladder for one checkpoint.
 
-    PIXELDIT_ROOT=/path/to/PixelDiT torchrun --nproc_per_node=4 eval.py \
+    PIXELDIT_ROOT=/path/to/PixelDiT torchrun --nproc_per_node=4 -m budgetpix.pixeldit.eval \
         --ckpt runs/pixeldit_1024/checkpoint-final.pt --line budgetpix \
         --prompts eval/prompts_2k.pt --real eval/real_2k \
         --budgets 4096,3645,3277,2867,2458,2048,1638,1229,1024 --tsv evals/ladder_1024.tsv
@@ -17,16 +17,17 @@ constant down the whole ladder.
 """
 from __future__ import annotations
 
-import argparse, csv, os, shutil, sys, time
+import argparse, csv, os, shutil, time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
 import torch
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from diffusion import FlowSchedule, sample                              # noqa: E402
-from cost import FlopMeter                                    # noqa: E402
+from .diffusion import FlowSchedule, sample
+from .cost import FlopMeter
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))      # the repository root
 
 COLS = ["tag", "line", "budget_tok", "cfg", "steps", "order", "n_prompts", "tok_final",
         "tok_traj", "n_fwd", "gflop_img", "gflop_patch", "gflop_floor", "FID", "IS", "minutes",
@@ -49,9 +50,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ckpt", default="", help="adaptive checkpoint (train.py output)")
     ap.add_argument("--released", default="", help="released .pth: the no-training control")
-    ap.add_argument("--released_cfg", default="configs/pixeldit_1024.yml")
+    ap.add_argument("--released_cfg", default=os.path.join(ROOT, "configs", "pixeldit", "pixeldit_1024.yml"))
     ap.add_argument("--line", required=True)
-    ap.add_argument("--prompts", required=True, help="scripts/encode_prompts.py output (emb/mask/null)")
+    ap.add_argument("--prompts", required=True, help="budgetpix.pixeldit.tools.encode_prompts output (emb/mask/null)")
     ap.add_argument("--real", required=True, help="folder of real images for FID")
     ap.add_argument("--real_name", default="", help="torch-fidelity feature cache name (default: folder name)")
     ap.add_argument("--n", type=int, default=0, help="prompts to use (default: all)")
@@ -84,12 +85,12 @@ def main():
     # ---- model
     import yaml
     if a.ckpt:
-        from convert import load_adaptive_checkpoint
+        from .convert import load_adaptive_checkpoint
         model, geo, cfg, _ = load_adaptive_checkpoint(a.ckpt, device=device, use_ema=not a.no_ema,
                                                       verbose=main_proc)
         src = a.ckpt
     elif a.released:
-        from train import build_model, geometry_of, resolve
+        from .train import build_model, geometry_of, resolve
         rc = resolve(a.released_cfg)
         cfg = yaml.safe_load(open(rc))
         cfg = dict(cfg, checkpoint=a.released, _config_path=os.path.abspath(rc))
@@ -107,7 +108,7 @@ def main():
     emb_all, mask_all = P["emb"][:N], P["mask"][:N]
     null_y = P.get("null")
     if null_y is None:
-        raise SystemExit(f"{a.prompts} has no 'null' embedding — regenerate it with scripts/encode_prompts.py "
+        raise SystemExit(f"{a.prompts} has no 'null' embedding — regenerate it with budgetpix.pixeldit.tools.encode_prompts "
                          f"(classifier-free guidance needs the negative-prompt embedding, not a zero mask)")
     real_name = a.real_name or Path(a.real).name
 

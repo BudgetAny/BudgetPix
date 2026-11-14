@@ -5,14 +5,13 @@
 Writes, under --out:
   imagenet/train-00000.parquet   ImageNet-1k parquet format (image.bytes JPEG + label), for the JiT and pMF trainers
   minit2i/chunk_000000.pt        MiniT2I chunk format (uint8 pixels + flan-t5 token ids), for the MiniT2I trainer
-  pixeldit_images/               images with .txt captions, the input of pixeldit/scripts/precompute_data.py
+  pixeldit_images/               images with .txt captions, the input of budgetpix.pixeldit.tools.precompute_data
   jit_released.pth               with --jit_from: a JiT checkpoint in the released format (`model_ema1`), made from the
                                  backbone of a BudgetPix JiT checkpoint, for the JiT trainer (the released JiT weights
                                  are distributed outside the Hugging Face Hub)
 The images are random shapes on gradients with noisy patches, so the entropy layouts vary across the image.
 """
 import argparse
-import importlib.util
 import io
 import os
 import sys
@@ -81,7 +80,7 @@ def main():
                 "caption": caps, "key": [f"tiny/{i}" for i in range(a.n)]}, os.path.join(d, "chunk_000000.pt"))
     print("[data]", os.path.join(d, "chunk_000000.pt"), flush=True)
 
-    # PixelDiT image folder (scripts/precompute_data.py --images encodes it)
+    # PixelDiT image folder (budgetpix.pixeldit.tools.precompute_data --images encodes it)
     d = os.path.join(a.out, "pixeldit_images")
     os.makedirs(d, exist_ok=True)
     for i in range(min(a.n, 8)):
@@ -90,11 +89,8 @@ def main():
     print("[data]", d, flush=True)
 
     if a.jit_from:
-        spec = importlib.util.spec_from_file_location("jit_model", os.path.join(ROOT, "jit", "model.py"))
-        m = importlib.util.module_from_spec(spec)
-        sys.modules[spec.name] = m
-        sys.path.insert(0, os.path.join(ROOT, "jit"))
-        spec.loader.exec_module(m)
+        sys.path.insert(0, ROOT)          # the repository root, which holds the budgetpix package
+        from budgetpix.jit import model as m
         ck = torch.load(a.jit_from, map_location="cpu", weights_only=False)
         sd = ck.get("model", ck)
         base = {k: v for k, v in sd.items() if not k.startswith(m.NEW_MODULES)}

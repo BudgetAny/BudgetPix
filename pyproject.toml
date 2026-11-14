@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "budgetpix"
+version = "0.1.0"
+description = "Unofficial, open-source implementation of BudgetPix: compute-adaptive tokenization for pixel-space image diffusion"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+# the same set as requirements.txt (see its comments for what each one is for)
+dependencies = [
+    "torch>=2.4",
+    "torchvision",
+    "einops",
+    "numpy",
+    "pillow",
+    "pyyaml",
+    "safetensors",
+    "transformers>=4.44",
+    "sentencepiece",
+    "accelerate",
+    "huggingface_hub",
+    "pyarrow",
+    "lpips",
+    "torch-fidelity @ git+https://github.com/LTH14/torch-fidelity.git@bfe72b9",
+]
+
+[project.urls]
+Homepage = "https://budgetany.github.io/budgetpix/"
+Paper = "https://arxiv.org/abs/2610.12307"
+Repository = "https://github.com/BudgetAny/BudgetPix"
+
+[tool.setuptools.packages.find]
+include = ["budgetpix*"]
+
+[tool.setuptools.package-data]
+"budgetpix.jit" = ["fid_stats/*.npz"]

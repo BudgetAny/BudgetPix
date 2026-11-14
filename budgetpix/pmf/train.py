@@ -1,24 +1,22 @@
 #!/usr/bin/env python
 """Fine-tune a released pMF (pixel MeanFlow) with the BudgetPix adaptive tokens.
 
-    PMF_ROOT=/path/to/pMF torchrun --nproc_per_node=7 train.py --arch L16 --data /path/to/imagenet-1k \
-        --ckpt ../checkpoints/pmf_released_L16_full_uv.pt --out runs/pmf_l16 --steps 64000 --batch 13 --anchor_p 0.30
+    PMF_ROOT=/path/to/pMF torchrun --nproc_per_node=7 -m budgetpix.pmf.train --arch L16 --data /path/to/imagenet-1k \
+        --ckpt checkpoints/pmf_released_L16_full_uv.pt --out runs/pmf_l16 --steps 64000 --batch 13 --anchor_p 0.30
 
 The released weights must be the FULL training state (u- and v-branches): the inference files on the Hub carry the u-path
 only; the converted B/16 and L/16 files are in the Hugging Face model repo next to the checkpoints."""
-import argparse, copy, os, sys, time
+import argparse, copy, os, time
 import torch
 import torch.distributed as dist
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, HERE)
-from upstream import add_pmf_root                                   # noqa: E402
+from .upstream import add_pmf_root
 add_pmf_root()
 from models.pmfDiT import pmfDiT_B_16, pmfDiT_L_16, pmfDiT_H_16   # noqa: E402
-from model import BudgetPixPMF, pmf_geometry                 # noqa: E402
-from loss import PMFLoss, PerceptualAux                     # noqa: E402
-from draw import draw_packed                                         # noqa: E402
-from data import ImageNetParquet, collate                   # noqa: E402
+from .model import BudgetPixPMF, pmf_geometry                 # noqa: E402
+from .loss import PMFLoss, PerceptualAux                     # noqa: E402
+from .draw import draw_packed                                         # noqa: E402
+from .data import ImageNetParquet, collate                   # noqa: E402
 
 ARCH = {"B16": pmfDiT_B_16, "L16": pmfDiT_L_16, "H16": pmfDiT_H_16}
 

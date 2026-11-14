@@ -7,7 +7,7 @@ Writes chunk_*.pt: pixel_values uint8 (n,3,512,512) [Resize(512, bicubic) + Cent
 input_ids/attention_mask int64 (n,256) from flan-t5-large, caption list[str], key list[str].
 Resumable: existing chunks are counted and skipped.
 
-  CC12M_OUT=/path/to/cc12m512 python scripts/cc12m_build.py --n-train 1000000 --procs 32
+  CC12M_OUT=/path/to/cc12m512 python -m budgetpix.minit2i.tools.cc12m_build --n-train 1000000 --procs 32
 """
 from __future__ import annotations
 import argparse, gzip, io, itertools, json, os, pathlib, time

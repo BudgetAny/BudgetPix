@@ -16,17 +16,13 @@ The layout L is constant for every call on an image (it carries no tangent in th
 from __future__ import annotations
 
 import math
-import os
-import sys
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, _HERE)
-from heads import PixelDiTRefineHead            # noqa: E402
-from layout import Geometry, all_base_tokens, pack   # noqa: E402
+from .heads import PixelDiTRefineHead
+from ..common.layout import Geometry, all_base_tokens, pack
 
 
 class ScaleMixer(nn.Module):

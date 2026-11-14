@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """One-step (1 NFE) class-conditional samples from a BudgetPix pMF checkpoint at a token budget.
 
-    PMF_ROOT=/path/to/pMF python sample.py --ckpt ../checkpoints/budgetpix_pmf_l16_256.pt \
+    PMF_ROOT=/path/to/pMF python -m budgetpix.pmf.sample --ckpt checkpoints/budgetpix_pmf_l16_256.pt \
         --classes 207,88,417,933 --budget 128 --out samples.png
 
 The layout is chosen up front:
@@ -15,24 +15,22 @@ Guidance defaults are the released pMF-L/16 settings (omega 7.0 on the CFG inter
 """
 from __future__ import annotations
 
-import argparse, os, sys
+import argparse, os
 
 import numpy as np
 import torch
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, HERE)
-from upstream import add_pmf_root                                   # noqa: E402
+from .upstream import add_pmf_root
 add_pmf_root()
-from eval import build, make_L, NOISE_SCALE, cell_scale     # noqa: E402
-from model import dense_L                                   # noqa: E402
-from layout import pack, detail_pyramid, _pyr_np, calibrate_offsets_batched, _leaf_masks_np, tokens_from_masks  # noqa: E402
+from .eval import build, make_L, NOISE_SCALE, cell_scale     # noqa: E402
+from .model import dense_L                                   # noqa: E402
+from ..common.layout import pack, detail_pyramid, _pyr_np, calibrate_offsets_batched, _leaf_masks_np, tokens_from_masks  # noqa: E402
 
 
 def layouts_from_images(paths, idx, geo, budget, dev):
     """Entropy pyramids of user images (centre-cropped to 256), bisected to the budget: one layout per sample."""
     from PIL import Image
-    from data import center_crop_arr
+    from .data import center_crop_arr
     ims = []
     for j in range(len(idx)):
         im = Image.open(paths[j % len(paths)]).convert("RGB")

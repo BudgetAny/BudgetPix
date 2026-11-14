@@ -6,8 +6,8 @@ model predicts x and the loss is the MSE of the implied velocity (x - z) / (1 - 
 import numpy as np
 import torch
 
-from layout import all_base_tokens, detail_pyramid, layouts_for_budget, pack
-from model import NUM_CLASSES
+from .layout import all_base_tokens, detail_pyramid, layouts_for_budget, pack
+from .model import NUM_CLASSES
 
 P_MEAN, P_STD, T_EPS, LABEL_DROP = -0.8, 0.8, 5e-2, 0.1
 

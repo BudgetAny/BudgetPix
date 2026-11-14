@@ -2,7 +2,7 @@
 threshold offset ~ U(offset_lo, offset_hi), its entropy maps replaced by random ones with prob scramble_p."""
 import numpy as np
 import torch
-from layout import all_base_tokens, detail_pyramid, pyramid_slice, _pyr_np, _leaf_masks_np, tokens_from_masks, pack
+from ..common.layout import all_base_tokens, detail_pyramid, pyramid_slice, _pyr_np, _leaf_masks_np, tokens_from_masks, pack
 
 
 def draw_layouts(images_u8, geo, *, offset_lo=0.0, offset_hi=2.0, anchor_p=0.15, scramble_p=0.10):

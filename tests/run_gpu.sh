@@ -32,26 +32,26 @@ step "1/5 layouts: tiling, budgets, packing (CPU)"
 python tests/test_layouts.py
 
 step "2/5 sampling from the BudgetPix checkpoints"
-if has jit; then (cd jit
-  python sample.py --ckpt "$CK/budgetpix_jit_b16_256.pth" --budget 128 --classes 207,88 --steps 10 --overlay --out "$S/jit_b16_b128.png"
-  python sample.py --ckpt "$CK/budgetpix_jit_b16_256.pth" --classes 207 --steps 10 --out "$S/jit_b16_dense.png"
-  python sample.py --ckpt "$CK/budgetpix_jit_b32_512.pth" --budget 128 --classes 88 --steps 10 --overlay --out "$S/jit_b32_b128.png"); fi
-if has pmf; then (cd pmf
-  python sample.py --ckpt "$CK/budgetpix_pmf_l16_256.pt" --classes 207,88 --budget 128 --overlay --out "$S/pmf_b128.png"
-  python sample.py --ckpt "$CK/budgetpix_pmf_l16_256.pt" --classes 207 --budget 256 --out "$S/pmf_dense.png"); fi
-if has minit2i; then (cd minit2i
-  python sample.py --ckpt "$CK/budgetpix_minit2i_b_512.pt" --prompts "a red fox in a snowy forest" --budget 512 --steps 10 --out "$S/minit2i_b_b512.png"); fi
-if has pixeldit; then (cd pixeldit
-  python sample.py --ckpt "$CK/budgetpix_pixeldit_1024.pt" --prompts "a red fox in a snowy forest" --budget 2048 --steps 8 --out "$S/pixeldit_b2048.png"); fi
+if has jit; then
+  python -m budgetpix.jit.sample --ckpt "$CK/budgetpix_jit_b16_256.pth" --budget 128 --classes 207,88 --steps 10 --overlay --out "$S/jit_b16_b128.png"
+  python -m budgetpix.jit.sample --ckpt "$CK/budgetpix_jit_b16_256.pth" --classes 207 --steps 10 --out "$S/jit_b16_dense.png"
+  python -m budgetpix.jit.sample --ckpt "$CK/budgetpix_jit_b32_512.pth" --budget 128 --classes 88 --steps 10 --overlay --out "$S/jit_b32_b128.png"; fi
+if has pmf; then
+  python -m budgetpix.pmf.sample --ckpt "$CK/budgetpix_pmf_l16_256.pt" --classes 207,88 --budget 128 --overlay --out "$S/pmf_b128.png"
+  python -m budgetpix.pmf.sample --ckpt "$CK/budgetpix_pmf_l16_256.pt" --classes 207 --budget 256 --out "$S/pmf_dense.png"; fi
+if has minit2i; then
+  python -m budgetpix.minit2i.sample --ckpt "$CK/budgetpix_minit2i_b_512.pt" --prompts "a red fox in a snowy forest" --budget 512 --steps 10 --out "$S/minit2i_b_b512.png"; fi
+if has pixeldit; then
+  python -m budgetpix.pixeldit.sample --ckpt "$CK/budgetpix_pixeldit_1024.pt" --prompts "a red fox in a snowy forest" --budget 2048 --steps 8 --out "$S/pixeldit_b2048.png"; fi
 
 step "3/5 comparison with an earlier run's samples"
 if [ -n "$REF" ]; then python tests/compare_images.py "$S" "$REF"; else echo "skipped (set REF to compare)"; fi
 
 step "4/5 tiny synthetic training data"
 python tests/make_tiny_data.py --out "$D" $(has jit && echo --jit_from "$CK/budgetpix_jit_b16_256.pth")
-if has pixeldit; then (cd pixeldit
-  python scripts/precompute_data.py --images "$D/pixeldit_images" --out "$D/pixeldit_chunks" --size 1024 --per_chunk 8
-  python scripts/encode_prompts.py --null_only --out "$D/null_emb.pt"); fi
+if has pixeldit; then
+  python -m budgetpix.pixeldit.tools.precompute_data --images "$D/pixeldit_images" --out "$D/pixeldit_chunks" --size 1024 --per_chunk 8
+  python -m budgetpix.pixeldit.tools.encode_prompts --null_only --out "$D/null_emb.pt"; fi
 
 step "5/5 training: 2 steps, a checkpoint, then --resume to step 3"
 train_twice() {   # <name> <command...>: run to step 2, then resume to step 3
@@ -61,17 +61,17 @@ train_twice() {   # <name> <command...>: run to step 2, then resume to step 3
   ls "$OUT/train_$name"/checkpoint-last.* > /dev/null
   echo "[train] $name: trained, saved and resumed"
 }
-jit_train()      { (cd jit && $RUN train.py --released "$D/jit_released.pth" --data "$D/imagenet" --out "$OUT/train_jit" \
-                     --batch_size 2 --grad_accum 1 --num_workers 1 --save_every 1 --log_every 1 --max_steps "$@"); }
-minit2i_train()  { local n=$1; shift; (cd minit2i && $RUN train.py --config configs/minit2i_b_512.yml --out "$OUT/train_minit2i" "$@" \
+jit_train()      { $RUN -m budgetpix.jit.train --released "$D/jit_released.pth" --data "$D/imagenet" --out "$OUT/train_jit" \
+                     --batch_size 2 --grad_accum 1 --num_workers 1 --save_every 1 --log_every 1 --max_steps "$@"; }
+minit2i_train()  { local n=$1; shift; $RUN -m budgetpix.minit2i.train --config configs/minit2i/minit2i_b_512.yml --out "$OUT/train_minit2i" "$@" \
                      --set checkpoint="${MINIT2I_WEIGHTS:?}" data.local_dataset_dir="$D/minit2i" data.micro_batch_size=1 \
-                           data.num_workers=1 batch_size=1 grad_accum=1 max_steps=$n save_every=1 log_every=1); }
-pixeldit_train() { local n=$1; shift; (cd pixeldit && $RUN train.py --config configs/pixeldit_1024.yml --out "$OUT/train_pixeldit" "$@" \
+                           data.num_workers=1 batch_size=1 grad_accum=1 max_steps=$n save_every=1 log_every=1; }
+pixeldit_train() { local n=$1; shift; $RUN -m budgetpix.pixeldit.train --config configs/pixeldit/pixeldit_1024.yml --out "$OUT/train_pixeldit" "$@" \
                      --set checkpoint="${PIXELDIT_WEIGHTS:?}" null_emb="$D/null_emb.pt" "data.chunks=[$D/pixeldit_chunks]" \
                            data.micro_batch_size=1 data.num_workers=1 batch_size=1 grad_accum=1 max_steps=$n save_every=1 \
-                           log_every=1 snapshot_every=0); }
-pmf_train()      { local n=$1; shift; (cd pmf && $RUN train.py --arch B16 --ckpt "$CK/pmf_released_B16_full_uv.pt" \
-                     --data "$D/imagenet" --out "$OUT/train_pmf" --batch 2 --workers 1 --save_every 1 --log_every 1 --steps $n "$@"); }
+                           log_every=1 snapshot_every=0; }
+pmf_train()      { local n=$1; shift; $RUN -m budgetpix.pmf.train --arch B16 --ckpt "$CK/pmf_released_B16_full_uv.pt" \
+                     --data "$D/imagenet" --out "$OUT/train_pmf" --batch 2 --workers 1 --save_every 1 --log_every 1 --steps $n "$@"; }
 for fam in $FAMILIES; do train_twice "$fam" "${fam}_train"; done
 
 echo; echo "ALL BUDGETPIX TESTS PASSED"

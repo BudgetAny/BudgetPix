@@ -1,6 +1,6 @@
 """Fine-tune a released MiniT2I checkpoint into BudgetPix.
 
-    MINIT2I_ROOT=/path/to/minit2i-torch torchrun --nproc_per_node=4 train.py --config configs/minit2i_l_512.yml --resume
+    MINIT2I_ROOT=/path/to/minit2i-torch torchrun --nproc_per_node=4 -m budgetpix.minit2i.train --config configs/minit2i/minit2i_l_512.yml --resume
 
 The config gives the released weights (`checkpoint`), the data (`data.local_dataset_dir`, see data.py) and the
 recipe. The added modules are zero-initialised and train `new_lr_mult` times faster; sample.py and eval.py load the EMA weights.
@@ -15,10 +15,10 @@ import torch
 import torch.distributed as dist
 import yaml
 
-from data import TextEncoder, make_loader, to_unit
-from diffusion import loss as diffusion_loss
-from layout import all_base_tokens, pack
-from model import NEW_MODULES, BudgetPixMiniT2I, geometry, load_released
+from .data import TextEncoder, make_loader, to_unit
+from .diffusion import loss as diffusion_loss
+from .layout import all_base_tokens, pack
+from .model import NEW_MODULES, BudgetPixMiniT2I, geometry, load_released
 
 
 def check_zero_init(model, net, geo, noise_scale, device):

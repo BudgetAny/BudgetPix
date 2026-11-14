@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from layout import Geometry
+from .layout import Geometry
 
 NEW_MODULES = ("mixers.", "refines.")
 

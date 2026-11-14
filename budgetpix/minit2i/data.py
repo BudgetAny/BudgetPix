@@ -1,6 +1,6 @@
 """Training data and text encoding.
 
-Data format (tensor chunks, written by scripts/mix120k_build.py or scripts/cc12m_build.py):
+Data format (tensor chunks, written by tools/mix120k_build.py or tools/cc12m_build.py):
     <dir>/chunk_*.pt = {"pixel_values": uint8 (n,3,512,512), "input_ids": (n,256), "attention_mask": (n,256),
                         "caption": list[str] (optional)}
 Chunks are split across ranks x workers, shuffled per pass, samples shuffled inside each chunk; infinite.

@@ -1,6 +1,6 @@
 """Fine-tune a released JiT checkpoint into BudgetPix on ImageNet-1k.
 
-    torchrun --nproc_per_node=4 train.py --released /path/to/jit-b-16/checkpoint-last.pth \
+    torchrun --nproc_per_node=4 -m budgetpix.jit.train --released /path/to/jit-b-16/checkpoint-last.pth \
         --data /path/to/imagenet-1k --epochs 100 --batch_size 112 --grad_accum 2 --out runs/jit_b16_256 --resume
 
 The architecture and resolution come from the released checkpoint. Every weight is trained: the released
@@ -17,10 +17,10 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader
 
-from data import ImageNetParquet, collate
-from diffusion import loss as diffusion_loss
-from layout import to_device
-from model import NEW_MODULES, load_jit, noise_scale
+from .data import ImageNetParquet, collate
+from .diffusion import loss as diffusion_loss
+from .layout import to_device
+from .model import NEW_MODULES, load_jit, noise_scale
 
 IMAGENET_TRAIN = 1281167
 

@@ -1,7 +1,7 @@
 """Class-conditional samples from a BudgetPix JiT checkpoint at a token budget.
 
-    python sample.py --ckpt ../checkpoints/budgetpix_jit_l32_512.pth --budget 128 --classes 207,88,417,933 --overlay
-    python sample.py --ckpt ../checkpoints/budgetpix_jit_b16_256.pth --sweep --classes 207,88
+    python -m budgetpix.jit.sample --ckpt checkpoints/budgetpix_jit_l32_512.pth --budget 128 --classes 207,88,417,933 --overlay
+    python -m budgetpix.jit.sample --ckpt checkpoints/budgetpix_jit_b16_256.pth --sweep --classes 207,88
 
 --budget is the number of tokens per image (256 = dense, 128 = 50 %, 64 = 25 %); omit it for the dense grid.
 --sweep draws one column per budget (100 / 75 / 50 / 25 %) from the same noise. --released runs a released
@@ -13,9 +13,9 @@ import os
 import torch
 from torchvision.utils import save_image
 
-from diffusion import sample
-from layout import draw_layout
-from model import load_budgetpix, load_jit, noise_scale
+from .diffusion import sample
+from .layout import draw_layout
+from .model import load_budgetpix, load_jit, noise_scale
 
 
 def main():

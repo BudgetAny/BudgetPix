@@ -7,7 +7,7 @@ Captions are dropped for 10 % of the images by zeroing their attention mask.
 import numpy as np
 import torch
 
-from layout import all_base_tokens, detail_pyramid, layouts_for_budget, pack, training_layouts
+from .layout import all_base_tokens, detail_pyramid, layouts_for_budget, pack, training_layouts
 
 P_MEAN, P_STD, T_EPS, CAPTION_DROP = -0.8, 0.8, 0.05, 0.1
 

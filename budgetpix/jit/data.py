@@ -12,7 +12,7 @@ import torch
 from PIL import Image
 from torch.utils.data import IterableDataset, get_worker_info
 
-from layout import pack, training_layouts
+from .layout import pack, training_layouts
 
 
 def center_crop_arr(pil_image, image_size):

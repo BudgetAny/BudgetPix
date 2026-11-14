@@ -11,7 +11,7 @@ int64 (n,256), caption, key = "<source>/<member>"); the last 1024 samples form t
 Pass 1 writes per-file uint8 shards under work<SUFFIX>/; pass 2 writes chunks_512<SUFFIX> / chunks_heldout<SUFFIX>.
 Resumable; .build.done<SUFFIX> marks completion.
 
-  MIX_OUT=/path/to/mix120k MIX_T5=google/flan-t5-large python scripts/mix120k_build.py --procs 24
+  MIX_OUT=/path/to/mix120k MIX_T5=google/flan-t5-large python -m budgetpix.minit2i.tools.mix120k_build --procs 24
 """
 from __future__ import annotations
 import argparse, io, json, os, pathlib, random, sys, tarfile, time

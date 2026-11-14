@@ -1,6 +1,6 @@
 """FID / IS of a BudgetPix JiT checkpoint at a token budget (class-conditional ImageNet).
 
-    torchrun --nproc_per_node=4 eval.py --ckpt ../checkpoints/budgetpix_jit_l32_512.pth --budget 128
+    torchrun --nproc_per_node=4 -m budgetpix.jit.eval --ckpt checkpoints/budgetpix_jit_l32_512.pth --budget 128
 
 50 images per class (50k), 50 Heun steps, CFG 3.0, PNGs scored by torch-fidelity against the reference
 statistics in fid_stats/. Image k always gets the same noise.
@@ -14,8 +14,8 @@ import torch
 import torch.distributed as dist
 from PIL import Image
 
-from diffusion import sample
-from model import load_budgetpix, load_jit, noise_scale
+from .diffusion import sample
+from .model import load_budgetpix, load_jit, noise_scale
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
