@@ -9,12 +9,12 @@
   🌐 <a href="https://budgetany.github.io/budgetpix/"><b>Project page</b></a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.12307">Paper</a> &nbsp;|&nbsp;
   🤗 <a href="https://huggingface.co/BudgetAny">Models</a> &nbsp;|&nbsp;
-  🧩 <a href="https://budgetany.github.io/">BudgetAny</a>: BudgetPix · <a href="https://github.com/BudgetAny/Budget3D">Budget3D</a> · <a href="https://budgetany.github.io/budgetlatent/">BudgetLatent</a>
+  🧩 <a href="https://budgetany.github.io/">BudgetAny</a>: BudgetPix · <a href="https://github.com/BudgetAny/Budget3D">Budget3D</a> · <a href="https://github.com/BudgetAny/BudgetLatent">BudgetLatent</a>
 </p>
 
 -----
 
-**In addition to BudgetPix, we now release its family, [BudgetAny](https://budgetany.github.io/), extended to [Budget3D](https://budgetany.github.io/budget3d/)** ([code](https://github.com/BudgetAny/Budget3D), [models](https://huggingface.co/BudgetAny)).
+**In addition to BudgetPix, we now release its family, [BudgetAny](https://budgetany.github.io/), extended to [Budget3D](https://budgetany.github.io/budget3d/) and [BudgetLatent](https://budgetany.github.io/budgetlatent/)** (code: [Budget3D](https://github.com/BudgetAny/Budget3D), [BudgetLatent](https://github.com/BudgetAny/BudgetLatent); [models](https://huggingface.co/BudgetAny)).
 
 **BudgetPix** makes pixel-space diffusion transformers compute-adaptive: one checkpoint runs at any token budget. An
 entropy-guided quadtree merges flat regions into coarser tokens, the backbone runs on the shorter sequence, and a small
@@ -30,7 +30,10 @@ token-local refiner restores the detail inside every merged token. The budget is
 
 ## 🔥 News
 
-- **Nov 2026:** BudgetPix joins [BudgetAny](https://budgetany.github.io/), next to [Budget3D](https://github.com/BudgetAny/Budget3D) and [BudgetLatent](https://budgetany.github.io/budgetlatent/) (coming soon).
+- **Nov 2026:** [BudgetLatent](https://github.com/BudgetAny/BudgetLatent) is out: code and weights for FLUX.2 [klein] 4B Base, the step-distilled FLUX.2 [klein] 4B,
+  FLUX 3 Image Klein Base and the step-distilled FLUX 3 Image Klein, each at any token budget, for text to image, editing and multi-reference
+  generation, and with the FLUX 3 models' layout boxes ([project page](https://budgetany.github.io/budgetlatent/), [models](https://huggingface.co/BudgetAny)).
+- **Nov 2026:** BudgetPix joins [BudgetAny](https://budgetany.github.io/), next to [Budget3D](https://github.com/BudgetAny/Budget3D) and [BudgetLatent](https://github.com/BudgetAny/BudgetLatent).
 - **Oct 2026:** Code and checkpoints for JiT, pixel MeanFlow, MiniT2I and PixelDiT.
 
 ## 📦 Models
